@@ -6,11 +6,10 @@
   <title>Database Global Sistem - Cek ID</title>
   <style>
     :root {
-      --bg: #000000;
+      --bg: #000;
       --neon-green: #00ff3c;
-      --row-red: #ff2b2b;
+      --red: #ff2b2b;
       --text: #e6ffe6;
-      --muted: rgba(255, 255, 255, 0.65);
     }
 
     html, body {
@@ -36,7 +35,6 @@
       letter-spacing: 1.5px;
       text-shadow: 0 0 10px #00ff3c, 0 0 20px #00ff3c;
       margin-bottom: 20px;
-      text-align: center;
     }
 
     .controls {
@@ -76,22 +74,14 @@
       box-shadow: 0 0 10px #00ff3c;
     }
 
-    #btnCheck:active {
-      transform: scale(0.97);
-    }
-
     #btnClear {
       background: linear-gradient(90deg, #ff4d4d, #b21d1d);
       color: white;
       box-shadow: 0 0 10px #ff2b2b;
     }
 
-    #btnClear:active {
-      transform: scale(0.97);
-    }
-
     .note {
-      color: var(--muted);
+      color: rgba(255, 255, 255, 0.65);
       font-size: 0.85rem;
       margin-bottom: 10px;
     }
@@ -128,10 +118,18 @@
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
+    /* Baris LOSE (merah) */
     .row-lose {
       background: linear-gradient(90deg, rgba(214,43,43,0.5), rgba(178,29,29,0.3));
       color: white;
       text-shadow: 0 0 4px #ff4d4d;
+    }
+
+    /* Baris WIN (hijau) */
+    .row-win {
+      background: linear-gradient(90deg, rgba(0,255,60,0.4), rgba(0,128,30,0.3));
+      color: #eaffea;
+      text-shadow: 0 0 6px #00ff3c;
     }
 
     .col-winrate {
@@ -139,7 +137,6 @@
     }
 
     .col-status {
-      color: #ff2b2b;
       font-weight: 800;
     }
 
@@ -199,6 +196,7 @@
     const btnCheck = document.getElementById("btnCheck");
     const btnClear = document.getElementById("btnClear");
     const tbody = document.getElementById("resultTable");
+    let isLoseNext = true; // mulai dari merah (LOSE)
 
     function getCurrentTime() {
       const d = new Date();
@@ -224,20 +222,39 @@
       }
 
       const tr = document.createElement("tr");
-      tr.classList.add("row-lose");
-      tr.innerHTML = `
-        <td>${number}</td>
-        <td class="col-winrate">${getRandomWinrate()}%</td>
-        <td class="col-status">LOSE</td>
-        <td class="col-verify">${getCurrentTime()}</td>
-      `;
+      const winrate = getRandomWinrate();
+      const time = getCurrentTime();
+
+      if (isLoseNext) {
+        tr.classList.add("row-lose");
+        tr.innerHTML = `
+          <td>${number}</td>
+          <td class="col-winrate">${winrate}%</td>
+          <td class="col-status" style="color:#ff4d4d;">LOSE</td>
+          <td class="col-verify">${time}</td>
+        `;
+      } else {
+        tr.classList.add("row-win");
+        tr.innerHTML = `
+          <td>${number}</td>
+          <td class="col-winrate">${winrate}%</td>
+          <td class="col-status" style="color:#00ff3c;">WIN</td>
+          <td class="col-verify">${time}</td>
+        `;
+      }
+
+      // Tambahkan baris ke atas tabel
       tbody.prepend(tr);
       input.value = "";
+
+      // Ganti status berikutnya (bergantian)
+      isLoseNext = !isLoseNext;
     });
 
     btnClear.addEventListener("click", () => {
       if (confirm("Hapus semua data di tabel?")) {
         tbody.innerHTML = "";
+        isLoseNext = true; // reset mulai dari merah lagi
       }
     });
   </script>
